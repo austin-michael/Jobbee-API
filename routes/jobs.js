@@ -1,11 +1,22 @@
 const express = require("express");
 const router = express.Router();
 
-router.get("/jobs", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "This route will display all jobs in future.",
-  });
-});
+// Importing jobs controller methods
+const {
+  getJobs,
+  newJob,
+  getJobsInRadius,
+  updateJob,
+  deleteJob,
+} = require("../controllers/jobsController");
+
+router.route("/jobs").get(getJobs);
+router.route("/jobs/:zipcode/:distance").get(getJobsInRadius);
+
+router.route("/job/new").post(newJob);
+
+router.route("/job/:id").put(updateJob);
+
+router.route("/job/:id").delete(deleteJob);
 
 module.exports = router;
