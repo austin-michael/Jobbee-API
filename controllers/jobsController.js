@@ -13,13 +13,21 @@ exports.getJobs = async (req, res, next) => {
   });
 };
 
-// Create a new job => /api/v1/job/new
-exports.newJob = async (req, res, next) => {
-  const job = await Job.create(req.body);
+// Get a single job with id and slug => /api/v1/job/:id/:slug
+exports.getJob = async (req, res, next) => {
+  const job = await Job.find({
+    $and: [{ _id: req.params.id }, { slug: req.params.slug }],
+  });
+
+  if (!job || job.length === 0) {
+    return res.status(404).json({
+      success: false,
+      message: "Job not found.",
+    });
+  }
 
   res.status(200).json({
     success: true,
-    message: "Job Created",
     data: job,
   });
 };
@@ -45,6 +53,17 @@ exports.getJobsInRadius = async (req, res, next) => {
     success: true,
     results: jobs.length,
     data: jobs,
+  });
+};
+
+// Create a new job => /api/v1/job/new
+exports.newJob = async (req, res, next) => {
+  const job = await Job.create(req.body);
+
+  res.status(200).json({
+    success: true,
+    message: "Job Created",
+    data: job,
   });
 };
 
@@ -87,5 +106,36 @@ exports.deleteJob = async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Job was deleted.",
+  });
+};
+
+// Get stats about a topic(job) => /api/v1/stats/:topic
+exports.jobStats = async (req, res, next) => {
+  const stats = await Job.aggregate([
+    {
+      $match: { $text: { $search: '"' + req.params.topic + '"' } },
+    },
+    {
+      $group: {
+        _id: { $toUpper: "$experience" },
+        totalJobs: { $sum: 1 },
+        avgPosition: { $avg: "$positions" },
+        avgSalary: { $avg: "$salary" },
+        minSalary: { $min: "$salary" },
+        maxSalary: { $max: "$salary" },
+      },
+    },
+  ]);
+
+  if (stats.length === 0) {
+    res.status(200).json({
+      success: false,
+      message: `No stats found for - ${req.params.topic}`,
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: stats,
   });
 };
