@@ -3,10 +3,11 @@ const app = express();
 
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
+const fileUpload = require("express-fileupload");
 
 const connectDatabase = require("./config/database");
 const errorMiddleware = require("./middlewares/errors");
-const errorHandler = require("./utils/errorHandler");
+const ErrorHandler = require("./utils/errorHandler");
 
 //Setting up config.env file variables
 dotenv.config({ path: "./config/config.env" });
@@ -27,13 +28,17 @@ app.use(express.json());
 // Set cookie parser
 app.use(cookieParser());
 
+// Handle file uploads
+app.use(fileUpload());
+
 //Import all routes
 const jobs = require("./routes/jobs");
 const auth = require("./routes/auth");
-const ErrorHandler = require("./utils/errorHandler");
+const user = require("./routes/user");
 
 app.use("/api/v1", jobs);
 app.use("/api/v1", auth);
+app.use("/api/v1", user);
 
 // Handle unhandled routes
 app.all("*", (req, res, next) => {
