@@ -9,6 +9,7 @@ const {
   getAppliedJobs,
   getPublishedJobs,
   getUsers,
+  adminDeleteUser,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
 
@@ -33,5 +34,9 @@ router.route("/profile/delete").delete(isAuthenticatedUser, deleteUser);
 router
   .route("/users")
   .get(isAuthenticatedUser, authorizeRoles("admin"), getUsers);
+
+router
+  .route("/user/:id")
+  .delete(isAuthenticatedUser, authorizeRoles("admin"), adminDeleteUser);
 
 module.exports = router;
