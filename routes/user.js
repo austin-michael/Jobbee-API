@@ -8,6 +8,7 @@ const {
   deleteUser,
   getAppliedJobs,
   getPublishedJobs,
+  getUsers,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
 
@@ -27,5 +28,10 @@ router.route("/password/update").put(isAuthenticatedUser, updatePassword);
 router.route("/profile/update").put(isAuthenticatedUser, updateUser);
 
 router.route("/profile/delete").delete(isAuthenticatedUser, deleteUser);
+
+// Admin only routes
+router
+  .route("/users")
+  .get(isAuthenticatedUser, authorizeRoles("admin"), getUsers);
 
 module.exports = router;
