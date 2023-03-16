@@ -15,10 +15,12 @@ const {
 
 const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
 
-router.route("/jobs").get(getJobs);
-router.route("/job/:id/:slug").get(getJob);
-router.route("/jobs/:zipcode/:distance").get(getJobsInRadius);
-router.route("/stats/:topic").get(jobStats);
+router.route("/jobs").get(isAuthenticatedUser, getJobs);
+router.route("/job/:id/:slug").get(isAuthenticatedUser, getJob);
+router
+  .route("/jobs/:zipcode/:distance")
+  .get(isAuthenticatedUser, getJobsInRadius);
+router.route("/stats/:topic").get(isAuthenticatedUser, jobStats);
 
 router
   .route("/job/new")
